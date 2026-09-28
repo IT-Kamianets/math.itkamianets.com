@@ -1,0 +1,196 @@
+<header class="site-header">
+	<nav class="wrap" aria-label="Main navigation">
+		<a class="brand" href="#top">
+			<span class="brand-mark" aria-hidden="true"><span></span></span>
+			Orbit Math
+		</a>
+		<div class="nav-links">
+			<a href="#practice">Practice</a>
+			<a href="#rewards">Rewards</a>
+			<a class="pill" href="#practice">Play now</a>
+		</div>
+	</nav>
+</header>
+
+<main id="top">
+	<section class="hero">
+		<div class="wrap hero-grid">
+			<div class="hero-copy">
+				<span class="eyebrow"><i></i> 10 minutes a day</span>
+				<h1>Tiny steps.<br /><em>Big brain.</em></h1>
+				<p>
+					Quick math quests that grow with every answer. Practice, level up, and collect brilliant
+					badges along the way.
+				</p>
+				<div class="hero-actions">
+					<a class="pill" href="#practice">Start a math quest</a>
+					<a class="text-link" href="#rewards">See the rewards</a>
+				</div>
+				<div class="trust">
+					<div class="avatars" aria-hidden="true">
+						<b>AJ</b>
+						<b>MO</b>
+						<b>LI</b>
+					</div>
+					<span>Made for curious minds ages 6&ndash;11</span>
+				</div>
+			</div>
+
+			<div class="play-card" aria-label="Example math challenge">
+				<div class="card-top">
+					<div class="kid">
+						<span class="kid-face" aria-hidden="true">🛸</span>
+						<span>Alex&rsquo;s quest</span>
+					</div>
+					<span class="streak">🔥 5 day streak</span>
+				</div>
+				<div class="progress-row">
+					<span>680 XP</span>
+					<div class="progress"><span></span></div>
+					<span>1,000</span>
+				</div>
+				<div class="question">
+					<small>Quick add</small>
+					<div class="sum">8 + 7 = ?</div>
+					<div class="answers">
+						@for (option of ['13', '15', '16']; track option) {
+							<button
+								class="answer"
+								[class.ok]="demoCorrect() === option"
+								(click)="tryDemoAnswer(option)"
+							>
+								{{ option }}
+							</button>
+						}
+					</div>
+				</div>
+				<div class="micro-win">
+					<strong>{{ demoMessage() }}</strong>
+					<span class="xp">+20 XP</span>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="practice" id="practice">
+		<div class="wrap">
+			<div class="section-head">
+				<span class="kicker">Try a quest</span>
+				<h2>Ready, set, solve!</h2>
+				<p>Choose a skill, answer the challenge, and watch your XP grow.</p>
+			</div>
+
+			<div class="game-shell">
+				<aside class="game-menu" aria-label="Math skills">
+					<h3>Pick a skill</h3>
+					@for (item of skills; track item) {
+						<button
+							class="skill"
+							[class.active]="skill() === item"
+							(click)="selectSkill(item)"
+						>
+							<span>{{ skillMeta[item].symbol }}</span>
+							<span>{{ skillMeta[item].title.split(' ')[0] }}</span>
+						</button>
+					}
+					<button class="skill locked" disabled>
+						<span>&divide;</span>
+						<span>Division &middot; Lv 5</span>
+					</button>
+				</aside>
+
+				<div class="session">
+					<div>
+						<div class="session-meta">
+							<span>Question {{ round() }} of 5</span>
+							<span>&#11088; {{ xp() }} XP earned</span>
+						</div>
+						<h3>{{ skillTitle }}</h3>
+						<div class="big-sum">{{ liveQuestion }}</div>
+						<form class="input-row" (ngSubmit)="submitAnswer()">
+							<label class="sr-only" for="answer-input">Your answer</label>
+							<input
+								id="answer-input"
+								name="answer"
+								inputmode="numeric"
+								autocomplete="off"
+								placeholder="Answer"
+								[(ngModel)]="answerInput"
+							/>
+							<button class="pill" type="submit">Check it</button>
+						</form>
+						<div class="feedback" [class.good]="feedbackState() === 'good'" [class.bad]="feedbackState() === 'bad'" aria-live="polite">
+							{{ feedback() }}
+						</div>
+					</div>
+					<aside class="coach">
+						<div class="coach-orb" aria-hidden="true">O</div>
+						<div>
+							<strong>Orbit says</strong>
+							<p>{{ coachCopy() }}</p>
+						</div>
+					</aside>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="rewards" id="rewards">
+		<div class="wrap">
+			<div class="section-head">
+				<span class="kicker">Every win counts</span>
+				<h2>Grow your galaxy</h2>
+				<p>Each answer builds confidence&mdash;and unlocks something worth celebrating.</p>
+			</div>
+
+			<div class="reward-grid">
+				<article class="reward-card">
+					<div class="reward-num">+20</div>
+					<h3>Earn XP as you learn</h3>
+					<p>Correct answers fill your meter and take you closer to the next level.</p>
+					<div class="week" aria-label="Practice streak">
+						<i class="done"></i>
+						<i class="done"></i>
+						<i class="done"></i>
+						<i class="done"></i>
+						<i class="today"></i>
+						<i></i>
+						<i></i>
+					</div>
+				</article>
+
+				<article class="reward-card featured">
+					<div class="level-ring" aria-label="Level 7, 72 percent complete"></div>
+					<h3>Level up your skills</h3>
+					<p>New number worlds open as your confidence grows.</p>
+				</article>
+
+				<article class="reward-card">
+					<div class="reward-num">12</div>
+					<h3>Collect achievements</h3>
+					<p>Unlock badges for streaks, speed, bravery, and brilliant problem solving.</p>
+					<div class="badge-row" aria-label="Example badges">
+						<span class="badge">&#9733;</span>
+						<span class="badge">7</span>
+						<span class="badge">&infin;</span>
+					</div>
+				</article>
+			</div>
+
+			<div class="rewards-cta">
+				<a class="pill light" href="#practice">Begin your first quest</a>
+				<p>No signup needed to try it.</p>
+			</div>
+		</div>
+	</section>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap foot">
+		<a class="brand" href="#top">
+			<span class="brand-mark" aria-hidden="true"><span></span></span>
+			Orbit Math
+		</a>
+		<small>Made for brave little problem-solvers.</small>
+	</div>
+</footer>
