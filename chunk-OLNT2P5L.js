@@ -1,0 +1,1 @@
+import{Fa as n}from"./chunk-XMTQRAM6.js";var t=class e{static \u0275fac=function(o){return new(o||e)};static \u0275cmp=n({type:e,selectors:[["app-profile"]],decls:0,vars:0,template:function(o,a){},encapsulation:2})};export{t as ProfileComponent};
