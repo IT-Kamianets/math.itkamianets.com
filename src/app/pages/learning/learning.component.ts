@@ -1,6 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map, startWith } from 'rxjs';
 
 @Component({
 	selector: 'app-learning',
@@ -34,7 +36,12 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class LearningComponent {
 	private readonly router = inject(Router);
-	protected readonly isTheory = computed(() => this.router.url.split('?')[0].split('#')[0] === '/theory');
+	private readonly currentUrl = toSignal(this.router.events.pipe(
+		filter((event) => event.constructor.name === 'NavigationEnd'),
+		map(() => this.router.url.split('?')[0].split('#')[0]),
+		startWith(this.router.url.split('?')[0].split('#')[0]),
+	), { initialValue: this.router.url.split('?')[0].split('#')[0] });
+	protected readonly isTheory = computed(() => this.currentUrl() === '/theory');
 	protected readonly type = signal<'test'|'equation'|'mistake'|'steps'>('test');
 	protected readonly answer = signal(''); protected readonly feedback = signal(''); protected readonly wasCorrect = signal(false);
 	protected readonly solved = signal(8); protected readonly points = signal(680); protected readonly showHint = signal(false);
