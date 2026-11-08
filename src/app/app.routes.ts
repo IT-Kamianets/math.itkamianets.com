@@ -15,6 +15,16 @@ export const routes: Routes = [
 			import('./pages/landing/landing.component').then((m) => m.LandingComponent),
 	},
 	{
+		path: 'practice',
+		data: { meta: { ...buildRouteMeta(companyProfile, '/practice'), title: 'Практика' } },
+		loadComponent: () => import('./pages/learning/learning.component').then((m) => m.LearningComponent),
+	},
+	{
+		path: 'theory',
+		data: { meta: { ...buildRouteMeta(companyProfile, '/theory'), title: 'Теорія' } },
+		loadComponent: () => import('./pages/learning/learning.component').then((m) => m.LearningComponent),
+	},
+	{
 		path: 'profile',
 		data: {
 			meta: {

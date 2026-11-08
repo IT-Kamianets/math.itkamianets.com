@@ -1,17 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-type Skill = 'add' | 'subtract' | 'multiply';
+type Skill = 'add' | 'subtract' | 'multiply' | 'equation';
+type Challenge = 'quick' | 'equation' | 'mistake' | 'steps';
 
-interface SkillMeta {
-	title: string;
-	symbol: string;
-}
-
-const SKILL_META: Record<Skill, SkillMeta> = {
-	add: { title: 'Addition adventure', symbol: '+' },
-	subtract: { title: 'Subtraction mission', symbol: '−' },
-	multiply: { title: 'Multiply power', symbol: '×' },
+const SKILLS: Record<Skill, { title: string; symbol: string }> = {
+	add: { title: 'Додавання', symbol: '+' },
+	subtract: { title: 'Віднімання', symbol: '−' },
+	multiply: { title: 'Множення', symbol: '×' },
+	equation: { title: 'Рівняння', symbol: 'x' },
 };
 
 @Component({
@@ -22,92 +19,101 @@ const SKILL_META: Record<Skill, SkillMeta> = {
 })
 export class LandingComponent {
 	protected readonly skill = signal<Skill>('add');
+	protected readonly challenge = signal<Challenge>('quick');
 	protected readonly round = signal(1);
-	protected readonly xp = signal(0);
-	protected readonly a = signal(0);
-	protected readonly b = signal(0);
-	protected readonly feedback = signal('You’ve got this.');
+	protected readonly xp = signal(680);
+	protected readonly rating = computed(() => Math.max(1, 128 - Math.floor((this.xp() - 680) / 20) * 2));
+	protected readonly correct = signal(18);
+	protected readonly streak = signal(5);
+	protected readonly a = signal(8);
+	protected readonly b = signal(7);
+	protected readonly answer = signal(15);
+	protected readonly feedback = signal('Обери відповідь або введи власну');
 	protected readonly feedbackState = signal<'' | 'good' | 'bad'>('');
-	protected readonly coachCopy = signal('Take your time. Smart thinking beats fast guessing!');
-	protected readonly demoMessage = signal('Pick your answer');
-	protected readonly demoCorrect = signal<string | null>(null);
-
-	private _answer = 0;
-	protected answerInput = '';
-
-	protected readonly skills: Skill[] = ['add', 'subtract', 'multiply'];
-	protected readonly skillMeta = SKILL_META;
-
-	constructor() {
-		this._nextQuestion();
-	}
-
-	protected get skillTitle(): string {
-		return SKILL_META[this.skill()].title;
-	}
-
-	protected get liveQuestion(): string {
-		return `${this.a()} ${SKILL_META[this.skill()].symbol} ${this.b()} = ?`;
-	}
+	protected readonly hint = signal('Рахуй крок за кроком — у тебе все вийде!');
+	protected readonly theoryTab = signal<'fractions' | 'equations' | 'geometry'>('fractions');
+	protected readonly skillMeta = SKILLS;
+	protected readonly skills: Skill[] = ['add', 'subtract', 'multiply', 'equation'];
+	protected readonly challengeTypes: { id: Challenge; title: string; icon: string }[] = [
+		{ id: 'quick', title: 'Тест', icon: '✳' },
+		{ id: 'equation', title: 'Рівняння', icon: 'x' },
+		{ id: 'mistake', title: 'Знайди помилку', icon: '⌕' },
+		{ id: 'steps', title: 'Задача', icon: '↗' },
+	];
+	protected readonly answerInput = signal('');
+	protected readonly liveQuestion = computed(() => {
+		const selected = this.skillMeta[this.skill()];
+		if (this.challenge() === 'equation') return `x + ${this.b()} = ${this.a() + this.b()}`;
+		if (this.challenge() === 'mistake') return `${this.a()} + ${this.b()} = ${this.a() + this.b() + 1}`;
+		if (this.challenge() === 'steps') return `Було ${this.a()} яблук. Додали ${this.b()}. Скільки стало?`;
+		return `${this.a()} ${selected.symbol} ${this.b()} = ?`;
+	});
+	protected readonly skillTitle = computed(() => this.challengeTypes.find((item) => item.id === this.challenge())?.title ?? 'Тест');
 
 	protected selectSkill(skill: Skill): void {
 		this.skill.set(skill);
+		this.challenge.set(skill === 'equation' ? 'equation' : 'quick');
 		this.round.set(1);
 		this.feedbackState.set('');
-		this.feedback.set('New mission loaded. Go for it!');
+		this.feedback.set('Нове завдання вже готове!');
 		this._nextQuestion();
 	}
 
-	protected submitAnswer(): void {
-		const value = Number(this.answerInput);
+	protected selectChallenge(challenge: Challenge): void {
+		this.challenge.set(challenge);
+		this.skill.set(challenge === 'equation' ? 'equation' : 'add');
+		this.feedbackState.set('');
+		this.feedback.set('Спробуй розв’язати завдання');
+	}
 
-		if (this.answerInput.trim() === '') {
+	protected submitAnswer(value = this.answerInput()): void {
+		if (value.trim() === '') {
 			this.feedbackState.set('bad');
-			this.feedback.set('Type an answer first.');
+			this.feedback.set('Введи відповідь, перш ніж перевіряти');
 			return;
 		}
-
-		if (value === this._answer) {
-			this.xp.update((xp) => xp + 20);
+		const expected = this.challenge() === 'equation' ? this.b() : this.answer();
+		const foundError = this.challenge() === 'mistake' && value === 'так';
+		const isCorrect = this.challenge() === 'mistake' ? foundError : Number(value) === expected;
+		if (isCorrect) {
+			const earned = this.challenge() === 'steps' ? 30 : 20;
+			this.xp.update((xp) => xp + earned);
+			this.correct.update((count) => count + 1);
 			this.feedbackState.set('good');
-			this.feedback.set('Correct! +20 XP — stellar work!');
-			this.coachCopy.set(
-				this.xp() >= 100
-					? 'Quest complete! You are ready for the next orbit.'
-					: 'That strategy worked. Let’s try another!',
-			);
-			this.round.set(this.round() < 5 ? this.round() + 1 : 1);
-			setTimeout(() => this._nextQuestion(), 850);
+			this.feedback.set(`Правильно! +${earned} балів ✨`);
+			this.hint.set(this.challenge() === 'mistake' ? 'Так! Тут забули додати одиницю до суми.' : `Чудова робота! Ти впорався за ${this.round()} завдань.`);
+			this.round.update((round) => round >= 5 ? 1 : round + 1);
+			if (this.challenge() === 'quick') setTimeout(() => this._nextQuestion(), 750);
 		} else {
 			this.feedbackState.set('bad');
-			this.feedback.set('Almost! Try once more—you’re learning.');
-			this.coachCopy.set('Check the numbers and give it another shot.');
+			this.feedback.set('Ще одна спроба — розберімося разом');
+			this.hint.set(this.challenge() === 'mistake' ? 'Порівняй обидві частини: чи правильно пораховано суму?' : `Підказка: ${this.a()} та ${this.b()} — це числа з умови. Перевір обчислення.`);
 		}
 	}
 
-	protected tryDemoAnswer(value: string): void {
-		const good = value === '15';
-		this.demoMessage.set(good ? 'Yes! Stellar solve ✦' : 'Good try—have another look');
-		this.demoCorrect.set(good ? value : null);
+	protected checkChoice(value: number): void {
+		if (value === 15) {
+			this.xp.update((xp) => xp + 20);
+			this.feedbackState.set('good');
+			this.feedback.set('Так! 8 + 7 = 15 — чудовий початок!');
+		} else {
+			this.feedbackState.set('bad');
+			this.feedback.set('Майже! Спробуй ще раз 😊');
+		}
 	}
+
+	protected setTheory(tab: 'fractions' | 'equations' | 'geometry'): void { this.theoryTab.set(tab); }
+	protected setTaskAnswer(value: string): void { this.answerInput.set(value); }
 
 	private _nextQuestion(): void {
-		let a = Math.ceil(Math.random() * 10);
-		let b = Math.ceil(Math.random() * 10);
 		const skill = this.skill();
-
-		if (skill === 'subtract' && b > a) {
-			[a, b] = [b, a];
-		}
-
-		if (skill === 'multiply') {
-			a = Math.ceil(Math.random() * 9);
-			b = Math.ceil(Math.random() * 9);
-		}
-
+		let a = Math.ceil(Math.random() * 12);
+		let b = Math.ceil(Math.random() * 12);
+		if (skill === 'subtract' && b > a) [a, b] = [b, a];
+		if (skill === 'multiply') { a = Math.ceil(Math.random() * 9); b = Math.ceil(Math.random() * 9); }
 		this.a.set(a);
 		this.b.set(b);
-		this._answer = skill === 'add' ? a + b : skill === 'subtract' ? a - b : a * b;
-		this.answerInput = '';
+		this.answer.set(skill === 'add' ? a + b : skill === 'subtract' ? a - b : skill === 'multiply' ? a * b : b);
+		this.answerInput.set('');
 	}
 }
