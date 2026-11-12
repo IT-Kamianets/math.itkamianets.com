@@ -1,18 +1,20 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 
 @Component({
 	selector: 'app-learning',
-	imports: [FormsModule],
+	imports: [FormsModule, RouterLink],
 	template: `
 		<div class="app-shell">
+			<aside class="sidebar"><a class="logo" routerLink="/">Math<span>Club</span></a><small class="menu-label">НАВЧАННЯ</small><a routerLink="/theory" [class.active]="isTheory()">📖 <span>Теорія</span></a><a routerLink="/practice" [class.active]="!isTheory()">✎ <span>Практика</span></a><div class="side-note"><span>✦</span><b>Твій прогрес</b><p>Ще один урок — ще один крок уперед.</p><i><span></span></i></div></aside>
 			<main class="content"><header><div><small>ТВІЙ ПРОСТІР НАВЧАННЯ</small><h1>{{ isTheory() ? 'Теорія' : 'Час практикуватися' }}</h1></div><div class="user"><span>М</span><b>Марко<small>Рівень 4</small></b></div></header>
 				@if (isTheory()) {
-					<div class="intro"><span class="tag">КОРОТКІ УРОКИ</span><h2>Зрозумій тему —<br>і задачі підкоряться.</h2><p>Обери урок, розбери приклад і одразу закріпи знання на практиці.</p></div>
-					<div class="topics">@for (topic of topics; track topic.name) { <article class="topic"><span class="topic-icon">{{ topic.icon }}</span><small>{{ topic.grade }} · {{ topic.time }}</small><h3>{{ topic.name }}</h3><p>{{ topic.description }}</p><div class="example"><b>ПРИКЛАД</b><strong>{{ topic.example }}</strong><span>{{ topic.explanation }}</span></div></article> }</div>
+					<div class="intro"><span class="tag">КОРОТКІ УРОКИ · ПРОСТІ ПОЯСНЕННЯ</span><h2>Зрозумій тему —<br>і задачі підкоряться.</h2><p>Обери короткий урок, розбери приклад і переходь до практики, щоб закріпити знання.</p><a class="intro-link" routerLink="/practice">Перейти до практики <span>→</span></a></div>
+					<div class="topics">@for (topic of topics; track topic.name) { <article class="topic"><span class="topic-icon">{{ topic.icon }}</span><small>{{ topic.grade }} · {{ topic.time }} читання</small><h3>{{ topic.name }}</h3><p>{{ topic.description }}</p><div class="example"><b>ПРИКЛАД</b><strong>{{ topic.example }}</strong><span>{{ topic.explanation }}</span></div><a class="topic-link" routerLink="/practice">До практики <span>→</span></a></article> }</div>
 				} @else {
 					<div class="practice-top"><div><span class="tag">ТРЕНУЙСЯ У СВОЄМУ ТЕМПІ</span><h2>Кожна спроба робить тебе сильнішим.</h2></div><div class="score">✦ {{ points() }} <small>балів</small></div></div>
 					<div class="layout"><section class="exercise"><div class="tabs">@for (kind of kinds; track kind.id) { <button [class.selected]="type()===kind.id" (click)="setType(kind.id)">{{kind.icon}} {{kind.label}}</button> }</div><div class="exercise-body"><div class="exercise-meta"><span>{{ difficulty() }} · Завдання {{ solved()+1 }}</span><span>✦ {{ reward() }} балів</span></div><div class="choices difficulty-choices">@for (level of difficultyLevels; track level) {<button [class.chosen]="difficulty()===level" (click)="difficulty.set(level)">{{level}}</button>}</div><div class="progress"><i [style.width.%]="Math.min(solved()*10+25,100)"></i></div><span class="tag">{{ promptTag() }}</span><h3>{{ question() }}</h3><p class="sub">{{ questionHint() }}</p>
