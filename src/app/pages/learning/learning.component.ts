@@ -1,28 +1,24 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 
 @Component({
 	selector: 'app-learning',
-	imports: [FormsModule, RouterLink, RouterLinkActive],
+	imports: [FormsModule],
 	template: `
 		<div class="app-shell">
-			<aside class="sidebar"><a class="logo" routerLink="/">∑ <span>математика</span></a><small class="menu-label">НАВЧАННЯ</small>
-				<a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">⌂ <span>Головна</span></a><a routerLink="/practice" routerLinkActive="active">▦ <span>Практика</span></a><a routerLink="/theory" routerLinkActive="active">▤ <span>Теорія</span></a><a routerLink="/profile" routerLinkActive="active">♙ <span>Мій профіль</span></a>
-				<div class="side-note"><span>✦</span><b>Щоденна ціль</b><p>Ще 2 завдання — і ти молодець!</p><i><span></span></i><small>3 з 5 виконано</small></div>
-			</aside>
-			<main class="content"><header><div><small>ТВІЙ ПРОСТІР НАВЧАННЯ</small><h1>{{ isTheory() ? 'Теорія' : 'Час практикуватися' }}</h1></div><a class="user" routerLink="/profile"><span>М</span><b>Марко<small>Рівень 4</small></b>⌄</a></header>
+			<main class="content"><header><div><small>ТВІЙ ПРОСТІР НАВЧАННЯ</small><h1>{{ isTheory() ? 'Теорія' : 'Час практикуватися' }}</h1></div><div class="user"><span>М</span><b>Марко<small>Рівень 4</small></b></div></header>
 				@if (isTheory()) {
 					<div class="intro"><span class="tag">КОРОТКІ УРОКИ</span><h2>Зрозумій тему —<br>і задачі підкоряться.</h2><p>Обери урок, розбери приклад і одразу закріпи знання на практиці.</p></div>
-					<div class="topics">@for (topic of topics; track topic.name) { <article class="topic"><span class="topic-icon">{{ topic.icon }}</span><small>{{ topic.grade }} · {{ topic.time }}</small><h3>{{ topic.name }}</h3><p>{{ topic.description }}</p><div class="example"><b>ПРИКЛАД</b><strong>{{ topic.example }}</strong><span>{{ topic.explanation }}</span></div><a routerLink="/practice">Перейти до практики <span>→</span></a></article> }</div>
+					<div class="topics">@for (topic of topics; track topic.name) { <article class="topic"><span class="topic-icon">{{ topic.icon }}</span><small>{{ topic.grade }} · {{ topic.time }}</small><h3>{{ topic.name }}</h3><p>{{ topic.description }}</p><div class="example"><b>ПРИКЛАД</b><strong>{{ topic.example }}</strong><span>{{ topic.explanation }}</span></div></article> }</div>
 				} @else {
 					<div class="practice-top"><div><span class="tag">ТРЕНУЙСЯ У СВОЄМУ ТЕМПІ</span><h2>Кожна спроба робить тебе сильнішим.</h2></div><div class="score">✦ {{ points() }} <small>балів</small></div></div>
 					<div class="layout"><section class="exercise"><div class="tabs">@for (kind of kinds; track kind.id) { <button [class.selected]="type()===kind.id" (click)="setType(kind.id)">{{kind.icon}} {{kind.label}}</button> }</div><div class="exercise-body"><div class="exercise-meta"><span>{{ difficulty() }} · Завдання {{ solved()+1 }}</span><span>✦ {{ reward() }} балів</span></div><div class="choices difficulty-choices">@for (level of difficultyLevels; track level) {<button [class.chosen]="difficulty()===level" (click)="difficulty.set(level)">{{level}}</button>}</div><div class="progress"><i [style.width.%]="Math.min(solved()*10+25,100)"></i></div><span class="tag">{{ promptTag() }}</span><h3>{{ question() }}</h3><p class="sub">{{ questionHint() }}</p>
 						@if (type()==='test') { <div class="choices">@for (choice of choices(); track choice) { <button [class.chosen]="answer()===choice.toString()" (click)="answer.set(choice.toString())">{{choice}}</button> }</div> } @else if (type()==='mistake') { <div class="choices"><button [class.chosen]="answer()==='Так'" (click)="answer.set('Так')">Так, є помилка</button><button [class.chosen]="answer()==='Ні'" (click)="answer.set('Ні')">Ні, усе правильно</button></div> } @else { <input type="number" [ngModel]="answer()" (ngModelChange)="answer.set($event)" placeholder="Твоя відповідь" (keydown.enter)="check()"> }
 						@if (feedback()) { <div class="feedback" [class.correct]="wasCorrect()">{{feedback()}}</div> }<button class="primary" (click)="check()">Перевірити відповідь <span>→</span></button><button class="hint" (click)="showHint.set(!showHint())">Потрібна підказка?</button>@if(showHint()){<p class="hint-text">{{ hintText() }}</p>}</div></section>
-					<aside class="lesson-card"><span class="lesson-icon">✎</span><small>ТЕОРІЯ ДО ТЕМИ</small><h3>{{ type()==='equation'?'Рівняння':type()==='steps'?'Текстові задачі':'Додавання' }}</h3><p>{{type()==='equation'?'Щоб знайти невідомий доданок, від суми відніми відомий доданок.':type()==='steps'?'Прочитай умову, знайди потрібні числа й обери дію.':'Розклади число на зручні частини та додай їх по черзі.'}}</p><div class="mini-example">{{type()==='equation'?'x + 6 = 14 → x = 8':type()==='steps'?'Було 12, додали 5: 12 + 5 = 17':'28 + 15 = 28 + 10 + 5 = 43'}}</div><a routerLink="/theory">Відкрити урок →</a><div class="daily"><b>🔥 Серія навчання</b><strong>5 днів поспіль</strong><small>Продовжуй у тому ж дусі!</small></div></aside></div>
+					<aside class="lesson-card"><span class="lesson-icon">✎</span><small>ТЕОРІЯ ДО ТЕМИ</small><h3>{{ type()==='equation'?'Рівняння':type()==='steps'?'Текстові задачі':'Додавання' }}</h3><p>{{type()==='equation'?'Щоб знайти невідомий доданок, від суми відніми відомий доданок.':type()==='steps'?'Прочитай умову, знайди потрібні числа й обери дію.':'Розклади число на зручні частини та додай їх по черзі.'}}</p><div class="mini-example">{{type()==='equation'?'x + 6 = 14 → x = 8':type()==='steps'?'Було 12, додали 5: 12 + 5 = 17':'28 + 15 = 28 + 10 + 5 = 43'}}</div><div class="daily"><b>🔥 Серія навчання</b><strong>5 днів поспіль</strong><small>Продовжуй у тому ж дусі!</small></div></aside></div>
 				}
 			</main>
 		</div>
