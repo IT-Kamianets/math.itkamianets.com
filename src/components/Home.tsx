@@ -1,17 +1,7 @@
-import mascot from '../assets/mascot.png';
-
 export default function Home() {
   return (
-    <section className="home-hero mx-auto grid w-full max-w-6xl items-center gap-8 px-5 py-10 sm:px-8 md:grid-cols-2 md:gap-12 md:py-16">
-      <div className="home-hero__art order-1 flex justify-center md:order-2">
-        <img
-          className="home-mascot h-auto w-full max-w-[420px] object-contain"
-          src={mascot}
-          alt="Дракон-маскот MathLearn"
-          fetchPriority="high"
-        />
-      </div>
-      <div className="home-hero__copy order-2 text-center md:order-1 md:text-left">
+    <section className="home-hero mx-auto w-full max-w-4xl px-5 py-16 text-center sm:px-8 md:py-24">
+      <div className="home-hero__copy">
         <span className="eyebrow"><span className="eyebrow-dot" /> Математика · 5–9 класи</span>
         <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-slate-800 sm:text-5xl lg:text-6xl">
           Вітаємо в <span className="text-orange-500">MathLearn!</span>
