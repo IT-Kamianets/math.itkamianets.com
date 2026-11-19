@@ -1,10 +1,12 @@
+import { lazy, Suspense } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Button from './components/Button';
 import Home from './components/Home';
 import Navbar from './components/Navbar';
-import PagePlaceholder from './components/PagePlaceholder';
 import Practice from './components/Practice';
 import Theory from './components/Theory';
+
+const Profile = lazy(() => import('./components/Profile'));
 
 function NotFound() {
   const navigate = useNavigate();
@@ -29,7 +31,14 @@ export default function App() {
           <Route path="/practice" element={<Practice />} />
           <Route path="/theory" element={<Theory />} />
           <Route path="/theory/:topicId" element={<Theory />} />
-          <Route path="/profile" element={<PagePlaceholder title="Твій математичний профіль" description="Тут будуть твій рейтинг, статистика, бали та досягнення." />} />
+          <Route
+            path="/profile"
+            element={(
+              <Suspense fallback={<div className="mx-auto w-full max-w-6xl px-5 py-16 text-center text-slate-500">Завантаження профілю…</div>}>
+                <Profile />
+              </Suspense>
+            )}
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
