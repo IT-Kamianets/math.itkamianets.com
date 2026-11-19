@@ -16,8 +16,6 @@ function PracticeSession({ items, topicTitle }: PracticeSessionProps) {
   const currentExercise = items[currentIndex];
   const isComplete = currentIndex >= total;
   const isCorrect = selectedAnswer === currentExercise?.correctAnswer;
-  const progress = total === 0 ? 0 : (currentIndex / total) * 100;
-
   if (total === 0) {
     return (
       <section className="mx-auto w-full max-w-2xl px-5 py-16 text-center sm:px-8">
