@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #1f2937;
   background: #f4f7fb;
   font-synthesis: none;
@@ -9,7 +9,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-optical-sizing: auto;
-  font-weight: 400;
+  font-weight: 300;
 }
 
 * { box-sizing: border-box; }
@@ -41,7 +41,7 @@ a { color: inherit; text-decoration: none; }
 .hero-copy { max-width: 700px; margin: 0 auto 44px; text-align: center; }
 .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 8px 13px; color: #e96319; background: #fff1e7; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
 .eyebrow-dot { width: 7px; height: 7px; background: #f26e21; border-radius: 50%; }
-.hero h1, .not-found h1 { margin: 19px 0 14px; color: #1f2937; font-size: clamp(36px, 5vw, 56px); line-height: 1.08; font-weight: 800; letter-spacing: -2.5px; }
+.hero h1, .not-found h1 { margin: 19px 0 14px; color: #1f2937; font-size: clamp(36px, 5vw, 56px); line-height: 1.08; font-weight: 700; letter-spacing: -2.5px; }
 .hero-description { max-width: 620px; margin: 0 auto; color: #687386; font-size: 17px; line-height: 1.7; }
 .placeholder-card { min-height: 250px; max-width: 790px; margin: 0 auto; padding: 34px 56px; display: flex; align-items: center; justify-content: center; gap: 48px; border: 1px solid #e8edf4; border-radius: 24px; background: #fff; box-shadow: 0 15px 40px rgb(39 61 91 / 7%); }
 .placeholder-art { position: relative; flex: 0 0 175px; height: 170px; border-radius: 50%; background: #fff5ed; display: grid; place-items: center; }
@@ -56,7 +56,7 @@ a { color: inherit; text-decoration: none; }
 .art-shape { position: absolute; right: 18px; bottom: 17px; color: #ef9ab0; font-size: 34px; transform: rotate(18deg); }
 .placeholder-message { max-width: 390px; }
 .placeholder-label { color: #f26e21; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-.placeholder-message h2 { margin: 10px 0 8px; color: #273244; font-size: 23px; line-height: 1.25; font-weight: 800; letter-spacing: -.5px; }
+.placeholder-message h2 { margin: 10px 0 8px; color: #273244; font-size: 23px; line-height: 1.25; font-weight: 700; letter-spacing: -.5px; }
 .placeholder-message p { margin: 0; color: #7a8494; font-size: 14px; line-height: 1.65; }
 .grade-note { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 25px; color: #8290a2; font-size: 13px; }
 .site-footer { max-width: 1200px; width: 100%; margin: 0 auto; padding: 20px 28px 24px; display: flex; justify-content: space-between; color: #97a1af; font-size: 12px; }
@@ -64,6 +64,15 @@ a { color: inherit; text-decoration: none; }
 .not-found-code { color: #f26e21; font-size: 96px; font-weight: 900; letter-spacing: -8px; line-height: 1; }
 .not-found h1 { font-size: clamp(30px, 4vw, 42px); letter-spacing: -1.5px; }
 .not-found p { margin: 0 0 24px; color: #687386; line-height: 1.7; }
+
+.home-mascot { animation: mascot-float 4s ease-in-out infinite; }
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-mascot { animation: none; }
+}
 
 @media (max-width: 767px) {
   .site-header { height: 68px; }
